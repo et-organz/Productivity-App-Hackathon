@@ -2,9 +2,6 @@ import tkinter as tk
 
 from tkinter import colorchooser
 
-
-
-
 class DrawingApp:
     def __init__(self, master):
         self.master = master
@@ -17,7 +14,8 @@ class DrawingApp:
         # Initialize drawing state
         self.cursor_x, self.cursor_y = 400, 300  # Start in the center of the canvas
         self.last_x, self.last_y = self.cursor_x, self.cursor_y  # Last position for drawing
-        self.constant_draw_mode = False
+        self.key_draw_mode = False
+        self.mouse_drawing = False
         self.current_color = "black"  # Default drawing color
 
         # Draw initial cursor
@@ -30,29 +28,84 @@ class DrawingApp:
         # Bind keyboard events
         self.master.bind("<KeyPress>", self.key_press)
 
-        # Instructions label
-        self.instructions = tk.Label(master, text="Controls:\nArrow Keys: Move Cursor\nSpace: Toggle Draw Mode",
+
+
+        # Bind mouse events to the canvas
+        self.canvas.bind("<Button-1>", self.start_mouse_draw)  # Left mouse button
+        self.canvas.bind("<B1-Motion>",  self.update_cursor)         # Mouse movement while button is pressed
+        self.canvas.bind("<ButtonRelease-1>", self.stop_mouse_draw)  # Release the button
+
+        self.instructions = tk.Label(master, text=f'Mouse Draw:\n Enter to switch to constant mouse draw mode \n Constant Mouse Draw : {self.mouse_drawing} \n Press space to switch to keyboard controls.',
                                      font=("Helvetica", 12))
         self.instructions.pack(pady=10)
 
         # Color selection button
         self.color_button = tk.Button(master, text="Choose Color", command=self.change_color, font=("Helvetica", 14))
         self.color_button.pack(pady=10)
+        # Clear button
+        self.clear_button = tk.Button(master, text="Clear", command=self.clear_canvas, font=("Helvetica", 14))
+        self.clear_button.pack(pady=10)
 
+    def get_mouse_instructions(self):
+        """get string for mouse instructions"""
+        text = f'Mouse Draw:\n Enter to switch to constant mouse draw mode \n Constant Mouse Draw : {self.mouse_drawing} \n Press space to switch to keyboard controls.'
+        return str(text)
+
+    def get_keyboard_instructions(self):
+        """get string for keyboard instructions"""
+        text = "Key Draw: Use Arrow Keys to Move and Draw \n Press space to switch to keyboard controls."
+        return str(text)
+    def start_mouse_draw(self, event):
+        """Start drawing when the mouse button is pressed."""
+        self.mouse_drawing = True
+        self.last_x, self.last_y = self.cursor_x, self.cursor_y
+    def mouse_draw(self, event):
+        """Draw on the canvas while the mouse is moving."""
+        if self.mouse_drawing:
+            # Draw a line from the last position to the current position
+            self.canvas.create_line(self.last_x, self.last_y, event.x, event.y, fill=self.current_color, width=2)
+            self.last_x, self.last_y = event.x, event.y  # Update last position
+
+    def stop_mouse_draw(self, event):
+        """Stop drawing when the mouse button is released."""
+        self.mouse_drawing = False
     def update_cursor(self, event):
         """Update the cursor position based on mouse movement."""
-        self.cursor_x, self.cursor_y = event.x, event.y
-        self.canvas.coords(self.cursor, self.cursor_x - 5, self.cursor_y - 5, self.cursor_x + 5, self.cursor_y + 5)
+        if not self.key_draw_mode:
+            self.cursor_x, self.cursor_y = event.x, event.y
+            self.canvas.coords(self.cursor, self.cursor_x - 5, self.cursor_y - 5, self.cursor_x + 5, self.cursor_y + 5)
+            self.mouse_draw(event)
+
+    def clear_canvas(self):
+        """Clear the drawing canvas."""
+        self.canvas.delete("all")  # Delete all items on the canvas
+        # Reset the cursor position
+        self.cursor_x, self.cursor_y = 400, 300  # Reset to center of the canvas
+        self.last_x, self.last_y = self.cursor_x, self.cursor_y
+        # Redraw the cursor
+        self.cursor = self.canvas.create_oval(self.cursor_x - 5, self.cursor_y - 5, self.cursor_x + 5,
+                                              self.cursor_y + 5, fill="red")
 
     def key_press(self, event):
         """Handle key presses for drawing with arrow keys and toggling draw mode."""
+        if event.keysym == 'Return':
+            if self.mouse_drawing:
+                self.stop_mouse_draw(None)
+                self.instructions.config(
+                    text=self.get_mouse_instructions())
+            elif not self.mouse_drawing:
+                self.start_mouse_draw(None)
+                self.instructions.config(
+                    text=self.get_mouse_instructions())
+
         if event.keysym == "space":
-            self.constant_draw_mode = not self.constant_draw_mode  # Toggle draw mode
-            if self.constant_draw_mode:
-                self.instructions.config(text="Constant Draw Mode: Use Arrow Keys to Move and Draw")
+            self.key_draw_mode = not self.key_draw_mode  # Toggle draw mode
+            if self.key_draw_mode:
+                self.instructions.config(text=self.get_keyboard_instructions())
             else:
-                self.instructions.config(text="Controls:\nArrow Keys: Move Cursor\nSpace: Toggle Draw Mode")
-        elif self.constant_draw_mode:
+                self.instructions.config(
+                    text=self.get_mouse_instructions())
+        elif self.key_draw_mode:
             if event.keysym == "Up":
                 self.move_cursor(0, -10)
             elif event.keysym == "Down":
@@ -75,7 +128,7 @@ class DrawingApp:
         self.canvas.coords(self.cursor, self.cursor_x - 5, self.cursor_y - 5, self.cursor_x + 5, self.cursor_y + 5)
 
         # Draw a line from the last position to the current position
-        if self.constant_draw_mode:
+        if self.key_draw_mode:
             self.canvas.create_line(self.last_x, self.last_y, self.cursor_x, self.cursor_y, fill=self.current_color,
                                     width=2)
 
