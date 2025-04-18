@@ -3,7 +3,7 @@ from tkinter import messagebox
 import time
 
 class BreathingApp:
-    def __init__(self, master):
+    def __init__(self, master,minutes=300):
         self.master = master
         self.master.title("Breathing Exercise")
 
@@ -19,12 +19,6 @@ class BreathingApp:
         self.start_button = tk.Button(master, text="Start Breathing Exercise", command=self.start_breathing, font=("Helvetica", 14))
         self.start_button.pack(pady=10)
 
-        self.cycle_count_label = tk.Label(master, text="Number of Cycles:", font=("Helvetica", 14))
-        self.cycle_count_label.pack(pady=10)
-
-        self.cycle_count_entry = tk.Entry(master, font=("Helvetica", 14))
-        self.cycle_count_entry.pack(pady=10)
-        self.cycle_count_entry.insert(0, "3")  # Default to 3 cycles
 
         self.breathing_cycle = [
             ("Breathe In", 4),  # Inhale for 4 seconds
@@ -32,15 +26,12 @@ class BreathingApp:
             ("Breathe Out", 6), # Exhale for 6 seconds
             ("Hold", 2)         # Hold for 2 seconds
         ]
+        cycle_time = 0
+        for name,time in self.breathing_cycle:
+            cycle_time += time
+        self.num_cycles = minutes//cycle_time
 
     def start_breathing(self):
-        try:
-            self.num_cycles = int(self.cycle_count_entry.get())
-            if self.num_cycles <= 0:
-                raise ValueError("Number of cycles must be positive.")
-        except ValueError:
-            messagebox.showerror("Invalid Input", "Please enter a valid number of cycles.")
-            return
 
         self.start_button.config(state=tk.DISABLED)  # Disable the button during the exercise
         self.breathing_sequence()
@@ -63,6 +54,3 @@ class BreathingApp:
         self.start_button.config(state=tk.NORMAL)  # Re-enable the button
 
 
-root = tk.Tk()
-app = BreathingApp(root)
-root.mainloop()

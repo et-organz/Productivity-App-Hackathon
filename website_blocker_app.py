@@ -18,6 +18,7 @@ class WebsiteBlockerApp:
         self.master.title("Website Blocker")
 
         self.blocked_websites = self.load_blocked_websites()
+        self.is_blocking_enabled = False  # Track whether blocking is enabled
 
         self.label = tk.Label(master, text="Blocked Websites:", font=("Helvetica", 14))
         self.label.pack(pady=10)
@@ -31,6 +32,12 @@ class WebsiteBlockerApp:
 
         self.remove_button = tk.Button(master, text="Remove Website", command=self.remove_website, font=("Helvetica", 12))
         self.remove_button.pack(side=tk.RIGHT, padx=20)
+
+        self.enable_button = tk.Button(master, text="Enable Blocking", command=self.enable_blocking, font=("Helvetica", 12))
+        self.enable_button.pack(pady=10)
+
+        self.disable_button = tk.Button(master, text="Disable Blocking", command=self.disable_blocking, font=("Helvetica", 12))
+        self.disable_button.pack(pady=10)
 
     def load_blocked_websites(self):
         """Load blocked websites from the hosts file."""
@@ -55,7 +62,8 @@ class WebsiteBlockerApp:
         website = simpledialog.askstring("Add Website", "Enter the website to block:")
         if website:
             self.blocked_websites.append(website.strip())
-            self.block_websites()
+            if self.is_blocking_enabled:
+                self.block_websites()  # Block the website immediately if blocking is enabled
             self.update_listbox()
 
     def remove_website(self):
@@ -64,10 +72,23 @@ class WebsiteBlockerApp:
         if selected:
             website = self.blocked_websites[selected[0]]
             self.blocked_websites.remove(website)
-            self.unblock_websites([website])
+            if self.is_blocking_enabled:
+                self.unblock_websites([website])  # Unblock the website immediately if blocking is enabled
             self.update_listbox()
         else:
             messagebox.showwarning("Remove Website", "Please select a website to remove.")
+
+    def enable_blocking(self):
+        """Enable website blocking."""
+        self.is_blocking_enabled = True
+        self.block_websites()  # Block all websites in the list
+        messagebox.showinfo("Blocking Enabled", "Website blocking is now enabled.")
+
+    def disable_blocking(self):
+        """Disable website blocking."""
+        self.is_blocking_enabled = False
+        self.unblock_websites(self.blocked_websites)  # Unblock all websites in the list
+        messagebox.showinfo("Blocking Disabled", "Website blocking is now disabled.")
 
     def block_websites(self):
         """Block the specified websites by modifying the hosts file."""
@@ -86,8 +107,3 @@ class WebsiteBlockerApp:
                 if not any(website in line for website in websites):
                     file.write(line)
             file.truncate()  # Remove remaining lines
-
-
-root = tk.Tk()
-app = WebsiteBlockerApp(root)
-root.mainloop()

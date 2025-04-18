@@ -139,6 +139,3 @@ class DrawingApp:
             self.current_color = color[1]  # Set the current color to the selected color
 
 
-root = tk.Tk()
-app = DrawingApp(root)
-root.mainloop()
