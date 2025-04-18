@@ -39,6 +39,9 @@ class WebsiteBlockerApp:
         self.disable_button = tk.Button(master, text="Disable Blocking", command=self.disable_blocking, font=("Helvetica", 12))
         self.disable_button.pack(pady=10)
 
+        self.close_button = tk.Button(master, text="Close Window", command=self.close_window, font=("Helvetica", 12))
+        self.close_button.pack(pady=10)
+
     def load_blocked_websites(self):
         """Load blocked websites from the hosts file."""
         blocked_websites = []
@@ -107,3 +110,7 @@ class WebsiteBlockerApp:
                 if not any(website in line for website in websites):
                     file.write(line)
             file.truncate()  # Remove remaining lines
+
+    def close_window(self):
+        """Close the Website Blocker window."""
+        self.master.destroy()  # Close the current window

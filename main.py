@@ -13,5 +13,6 @@ def print_hi(name):
 if __name__ == '__main__':
 
     app_controller = AppController()
+    app_controller.confirmation_window()
     app_controller.root.mainloop()
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

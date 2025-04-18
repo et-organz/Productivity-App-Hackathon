@@ -11,9 +11,6 @@ class AppController:
         self.root = tk.Tk()
         self.root.withdraw()  # Hide the main window initially
 
-        # Create an initial confirmation window
-        self.confirmation_window()
-
         self.apps = {
             "website_blocker": WebsiteBlockerApp,
             "breathing": BreathingApp,
@@ -38,6 +35,8 @@ class AppController:
 
     def start_pomodoro(self, confirm_window):
         """Start the Pomodoro timer and close the confirmation window."""
+        if "website_blocker" in  self.app_instances:
+            self.app_instances["website_blocker"].block_websites()
         confirm_window.destroy()  # Close the confirmation window
         self.open_app("pomodoro")  # Open the Pomodoro timer
 
