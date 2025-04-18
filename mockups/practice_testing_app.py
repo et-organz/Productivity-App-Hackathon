@@ -1,6 +1,9 @@
 import tkinter as tk
 import threading
-
+from dotenv import load_dotenv
+from openai import OpenAI
+import os
+load_dotenv()
 class PracticeTestingApp:
     def __init__(self, root, openai_session):
         self.root = root
@@ -33,7 +36,7 @@ class PracticeTestingApp:
             )
 
             try:
-                response = self.openai_session.ChatCompletion.create(
+                response = self.openai_session.chat.completions.create(
                     model="gpt-4",
                     messages=[
                         {"role": "system", "content": "You help students generate practice test questions."},
@@ -47,3 +50,7 @@ class PracticeTestingApp:
                 self.test_output_label.config(text=f"Error: {e}")
 
         threading.Thread(target=task).start()
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+root = tk.Tk()
+app = PracticeTestingApp(root,client)
+root.mainloop()

@@ -5,12 +5,17 @@ import random
 from website_blocker_app import WebsiteBlockerApp
 from breathing_app import BreathingApp
 from drawing_app import DrawingApp
-from mockups.encouragement_app import EncouragementApp
+from encouragement_app import EncouragementApp
+import os
+from dotenv import load_dotenv
+import openai
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
 class AppController:
     def __init__(self):
         self.root = tk.Tk()
         self.root.withdraw()  # Hide the main window initially
-
+        self.open_ai_session = openai
         self.apps = {
             "website_blocker": WebsiteBlockerApp,
             "breathing": BreathingApp,
