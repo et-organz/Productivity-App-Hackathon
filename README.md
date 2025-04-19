@@ -21,7 +21,9 @@ Clone the repo and install the requirements:
 git clone https://github.com/yourusername/productivity-app.git
 cd productivity-app
 pip install -r requirements.txt
+touch .env
 ```
+Make sure to add a ChatGPT api key to the .env file under OPENAI_API_KEY
 
 ## Blocking Websites
 ### How to use the Website Blocking 
