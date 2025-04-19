@@ -55,15 +55,15 @@ class AppController:
         )
         blocker_button.pack(side=tk.LEFT, padx=20)
 
-        track_button = tk.Button(
-            confirm_window,
-            text="Start Tracking",
-            command=lambda: self.start_tracking(),
-            font=("Helvetica", 14)
-        )
-        track_button.pack(side=tk.LEFT, padx=20)
-    def start_tracking(self):
-        create_web_tracking()
+        # track_button = tk.Button(
+        #     confirm_window,
+        #     text="Start Tracking",
+        #     command=lambda: self.start_tracking(),
+        #     font=("Helvetica", 14)
+        # )
+        # track_button.pack(side=tk.LEFT, padx=20)
+    # def start_tracking(self):
+    #     create_web_tracking()
     def start_pomodoro(self, confirm_window):
         """Start the Pomodoro timer and close the confirmation window."""
         if "website_blocker" in  self.app_instances:
