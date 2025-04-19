@@ -14,6 +14,9 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 class AppController:
     def __init__(self):
         self.root = tk.Tk()
+        self.chat_gpt_messages = None
+
+
         self.root.withdraw()  # Hide the main window initially
         self.open_ai_session = openai
         self.apps = {

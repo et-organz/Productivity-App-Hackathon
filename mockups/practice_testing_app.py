@@ -3,11 +3,12 @@ import threading
 from dotenv import load_dotenv
 from openai import OpenAI
 import os
+
 load_dotenv()
+openai_session = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 class PracticeTestingApp:
-    def __init__(self, root, openai_session):
+    def __init__(self, root):
         self.root = root
-        self.openai_session = openai_session
         self.frame = tk.Frame(root)
         self.frame.pack(padx=10, pady=10)
 
@@ -23,6 +24,11 @@ class PracticeTestingApp:
         self.test_output_label = tk.Label(self.frame, text="", wraplength=400, font=("Helvetica", 12))
         self.test_output_label.pack(pady=10)
 
+        # Track conversation messages
+        self.messages = [
+            {"role": "system", "content": "You help students generate practice test questions."}
+        ]
+
     def generate_practice_test(self):
         learning_goal = self.goal_input.get("1.0", tk.END).strip()
         if learning_goal:
@@ -30,27 +36,35 @@ class PracticeTestingApp:
 
     def generate_test(self, learning_goal):
         def task():
-            prompt = (
+            user_message = (
                 f"Create a set of practice test questions based on the following learning goal: '{learning_goal}'. "
                 "Provide multiple-choice questions and include answers after each question."
             )
 
+            # Add user message to conversation history
+            self.messages.append({"role": "user", "content": user_message})
+
             try:
-                response = self.openai_session.chat.completions.create(
-                    model="gpt-4",
-                    messages=[
-                        {"role": "system", "content": "You help students generate practice test questions."},
-                        {"role": "user", "content": prompt}
-                    ],
+                response = openai_session.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=self.messages,
                     temperature=0.7
                 )
-                questions = response.choices[0].message['content']
-                self.test_output_label.config(text=questions)
+
+                assistant_message = response.choices[0].message.content
+
+                # Add assistant response to conversation history
+                self.messages.append({"role": "assistant", "content": assistant_message})
+
+                self.test_output_label.config(text=assistant_message)
+
             except Exception as e:
                 self.test_output_label.config(text=f"Error: {e}")
 
         threading.Thread(target=task).start()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# Create OpenAI client and launch the app
+
 root = tk.Tk()
-app = PracticeTestingApp(root,client)
+app = PracticeTestingApp(root)
 root.mainloop()

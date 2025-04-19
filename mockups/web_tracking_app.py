@@ -8,6 +8,9 @@ from dotenv import load_dotenv
 import os
 from openai import OpenAI
 
+
+# Comment:when you press a button it scrapes and saves whatever is on the website button is in tkinker
+
 # Load environment variables
 load_dotenv()
 
@@ -47,23 +50,33 @@ class ReadingTrackerApp:
         self.tracking_thread = threading.Thread(target=self.track_reading)
         self.tracking_thread.start()
 
+    def record_website(self, url):
+        """Appends the visited URL to a log file"""
+        with open("visited_urls.txt", "a") as file:
+            file.write(url + "\n")
+        self.response_label.config(text=f"Visited URL recorded:\n{url}")
+
     def track_reading(self):
         try:
+            # Prompt the user for a URL
+            url_input = tk.simpledialog.askstring("Enter URL", "Enter the URL of the website to track:")
+            if not url_input:
+                self.response_label.config(text="No URL provided. Tracking cancelled.")
+                self.is_tracking = False
+                self.track_button.config(text="Start Tracking")
+                return
+
             options = webdriver.ChromeOptions()
             options.add_argument("--headless")
             self.driver = webdriver.Chrome(options=options)
 
-            self.driver.get("https://en.wikipedia.org/wiki/Michel_de_Montaigne")
+            self.driver.get(url_input)
             time.sleep(2)
 
-            reading_text = ""
+            current_url = self.driver.current_url
+            self.record_website(current_url)
+
             while self.is_tracking:
-                body_content = self.driver.find_element(By.TAG_NAME, "body").text
-
-                if body_content != reading_text:
-                    reading_text = body_content
-                    self.send_to_llm(reading_text)
-
                 time.sleep(5)
 
             if self.driver:
@@ -72,6 +85,7 @@ class ReadingTrackerApp:
         except Exception as e:
             logging.error(f"Error tracking reading: {e}")
             self.response_label.config(text=f"Error tracking: {e}")
+
 
     def send_to_llm(self, reading_text):
         def task():

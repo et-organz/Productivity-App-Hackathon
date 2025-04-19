@@ -3,6 +3,8 @@ import cv2
 from face_alignment import FaceAlignment, LandmarksType
 import numpy as np
 from threading import Thread
+from encouragement_app import EncouragementApp
+
 
 class BoredomDetector:
     def __init__(self, model_path):
@@ -12,7 +14,7 @@ class BoredomDetector:
         self.model = torch.load(model_path, weights_only=False)
         self.model.to(self.device)
         self.model.eval()
-
+        self.encouragement_window = None
         self.running = False
         self.capture = None
         self.thread = None
@@ -31,6 +33,8 @@ class BoredomDetector:
             arousal = output[0][1].item()
 
             if valence < 0.3 and arousal < 0.3:
+                if not self.encouragement_window.master:
+                    self.encouragement_window.master = EncouragementApp()
                 return "Bored", valence, arousal
             else:
                 return "Not Bored", valence, arousal
@@ -48,7 +52,8 @@ class BoredomDetector:
 
             if valence is not None and arousal is not None:
                 cv2.putText(frame, f"State: {state}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-                cv2.putText(frame, f"Valence: {valence:.2f}, Arousal: {arousal:.2f}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                cv2.putText(frame, f"Valence: {valence:.2f}, Arousal: {arousal:.2f}", (10, 60),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
             cv2.imshow("Emotion Detection", frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):

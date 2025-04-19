@@ -3,11 +3,13 @@ import threading
 from dotenv import load_dotenv
 from openai import OpenAI
 import os
+
 load_dotenv()
+
+openai_session = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 class SelfExplanationApp:
-    def __init__(self, root, openai_session):
+    def __init__(self, root, messages):
         self.root = root
-        self.openai_session = openai_session
         self.frame = tk.Frame(root)
         self.frame.pack(padx=10, pady=10)
 
@@ -25,6 +27,11 @@ class SelfExplanationApp:
 
         self.previous_learnings = []
 
+        # Track conversation messages
+        self.messages = [
+            {"role": "system", "content": "You help students make connections between concepts they've learned."}
+        ]
+
     def submit_learning(self):
         current_learning = self.learning_input.get("1.0", tk.END).strip()
         if current_learning:
@@ -33,29 +40,38 @@ class SelfExplanationApp:
 
     def generate_self_explanation(self, current_learning):
         def task():
-            prompt = (
+            user_message = (
                 "You are a tutor helping a student reflect on what they learned. "
                 f"The student just said: '{current_learning}'. "
                 f"Their past learnings were: {self.previous_learnings[:-1]}. "
                 "Help them explain how what they just learned relates to their past learnings."
             )
 
+            # Add user message to conversation history
+            self.messages.append({"role": "user", "content": user_message})
+
             try:
-                response = self.openai_session.chat.completions.create(
-                    model="gpt-4",
-                    messages=[
-                        {"role": "system", "content": "You help students make connections between concepts they've learned."},
-                        {"role": "user", "content": prompt}
-                    ],
+                response = openai_session.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=self.messages,
                     temperature=0.7
                 )
-                message = response.choices[0].message['content']
-                self.response_label.config(text=message)
+
+                assistant_message = response.choices[0].message['content']
+
+                # Add assistant response to conversation history
+                self.messages.append({"role": "assistant", "content": assistant_message})
+
+                self.response_label.config(text=assistant_message)
+
             except Exception as e:
                 self.response_label.config(text=f"Error: {e}")
 
         threading.Thread(target=task).start()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+
+# Create OpenAI client and launch the app
+
 root = tk.Tk()
-app = SelfExplanationApp(root,client)
+app = SelfExplanationApp(root)
 root.mainloop()
