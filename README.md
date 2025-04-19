@@ -1,6 +1,6 @@
-# Productivity App
+# Focus +
 
-**Productivity App** is a Pomodoro-based study system designed to boost your focus and maximize learning retention. Backed by the latest research in cognitive science and productivity, this tool helps you structure your study sessions for optimal performance.
+**Focus +** is a Pomodoro-based study system designed to boost your focus and maximize learning retention. Backed by the latest research in cognitive science and productivity, this tool helps you structure your study sessions for optimal performance.
 
 ## Features
 
@@ -11,7 +11,7 @@
 
 ## Why It Works
 
-The Pomodoro Technique leverages focused work sprints followed by short breaks. This approach improves concentration and reduces mental fatigue. By integrating this with research-backed learning strategies, **Productivity App** helps you study smarter, not harder.
+The Pomodoro Technique leverages focused work sprints followed by short breaks. This approach improves concentration and reduces mental fatigue. By integrating this with research-backed learning strategies, **Focus +** helps you study smarter, not harder.
 
 ## Getting Started
 
