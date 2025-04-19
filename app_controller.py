@@ -72,7 +72,8 @@ class AppController:
 
     def close_app(self, app_name):
         if app_name in self.app_instances:
-            self.chat_gpt_messages = self.app_instances[app_name].messages
+            if app_name != "pomodoro" and app_name != "drawing" and app_name != "breathing":
+                self.chat_gpt_messages = self.app_instances[app_name].messages
             self.app_instances[app_name].master.destroy()
             self.app_states[app_name] = False
 
@@ -91,9 +92,9 @@ class AppController:
         choices = [name for name in ["breathing", "drawing", "explanation","integration","practice"] if not self.app_states[name]]
         if choices:
             return random.choice(choices)
-    def find_open_app(self):
+    def find_open_break_app(self):
         res = None
-        res = [app_name for app_name, app_state in  self.app_states if app_state]
+        res = [app_name for app_name, app_state in  self.app_states if app_state ]
         return res
 
 
