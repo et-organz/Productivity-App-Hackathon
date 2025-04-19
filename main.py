@@ -5,6 +5,7 @@ import os
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 from app_controller import AppController
+
 import tkinter as tk
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
@@ -13,7 +14,6 @@ def print_hi(name):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-
     app_controller = AppController()
     app_controller.confirmation_window()
     app_controller.root.mainloop()

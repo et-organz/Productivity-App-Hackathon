@@ -9,7 +9,7 @@ load_dotenv()
 openai_session = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 class SelfExplanationApp:
     def __init__(self, root, messages):
-        self.root = root
+        self.master = root
         self.frame = tk.Frame(root)
         self.frame.pack(padx=10, pady=10)
 
@@ -38,33 +38,32 @@ class SelfExplanationApp:
             self.generate_self_explanation(current_learning)
 
     def generate_self_explanation(self, current_learning):
-        def task():
-            user_message = (
-                "You are a tutor helping a student reflect on what they learned. "
-                f"The student just said: '{current_learning}'. "
-                f"Their past learnings were: {self.previous_learnings[:-1]}. "
-                "Help them explain how what they just learned relates to their past learnings."
+        user_message = (
+            "You are a tutor helping a student reflect on what they learned. "
+            f"The student just said: '{current_learning}'. "
+            f"Their past learnings were: {self.previous_learnings[:-1]}. "
+            "Help them explain how what they just learned relates to their past learnings."
+        )
+
+        # Add user message to conversation history
+        self.messages.append({"role": "user", "content": user_message})
+
+        try:
+            response = openai_session.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=self.messages,
+                temperature=0.7
             )
 
-            # Add user message to conversation history
-            self.messages.append({"role": "user", "content": user_message})
+            assistant_message = response.choices[0].message.content
 
-            try:
-                response = openai_session.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=self.messages,
-                    temperature=0.7
-                )
+            # Add assistant response to conversation history
+            self.messages.append({"role": "assistant", "content": assistant_message})
 
-                assistant_message = response.choices[0].message.content
+            self.response_label.config(text=assistant_message)
 
-                # Add assistant response to conversation history
-                self.messages.append({"role": "assistant", "content": assistant_message})
-
-                self.response_label.config(text=assistant_message)
-
-            except Exception as e:
-                self.response_label.config(text=f"Error: {e}")
+        except Exception as e:
+            self.response_label.config(text=f"Error: {e}")
 
 
 

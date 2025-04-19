@@ -8,7 +8,7 @@ load_dotenv()
 openai_session = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 class InterrogationApp:
     def __init__(self, root, messages):
-        self.root = root
+        self.master = root
         self.frame = tk.Frame(root)
         self.frame.pack(padx=10, pady=10)
 
@@ -64,6 +64,3 @@ class InterrogationApp:
         except Exception as e:
             self.response_label.config(text=f"Error: {e}")
 
-root = tk.Tk()
-app = InterrogationApp(root,[])
-root.mainloop()

@@ -18,7 +18,7 @@ class EncouragementApp:
             response = openai_session.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "You are a motivational coach helping users stay focused. Your responses can not be longer than 10 words."},
+                    {"role": "system", "content": "You are a motivational coach helping users stay focused. Your responses can not be longer than 10 words. The user is bored get them out of it."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.7
