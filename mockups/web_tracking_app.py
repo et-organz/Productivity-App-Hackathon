@@ -5,7 +5,7 @@ import tkinter as tk
 import threading
 import shutil
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 
 class ReadingTrackerApp:
     def __init__(self, root):
@@ -111,11 +111,11 @@ class ReadingTrackerApp:
                         self.seen_urls[current_date].add(line)
 
     def get_date_from_timestamp(self, timestamp):
-        # Convert timestamp to a date string in YYYY-MM-DD format
-        # Chrome stores the timestamp in microseconds; divide by 1,000,000 to get seconds
+        # Convert Chrome's timestamp (microseconds since Jan 1, 1601) to seconds since epoch
         timestamp = timestamp / 1000000
-        visit_time = datetime.utcfromtimestamp(timestamp)
+        visit_time = datetime.fromtimestamp(timestamp, tz=timezone.utc)
         return visit_time.strftime('%Y-%m-%d')
+
 
 if __name__ == "__main__":
     root = tk.Tk()
