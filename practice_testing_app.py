@@ -61,9 +61,3 @@ class PracticeTestingApp:
                 self.test_output_label.config(text=f"Error: {e}")
 
         threading.Thread(target=task).start()
-
-# Create OpenAI client and launch the app
-
-root = tk.Tk()
-app = PracticeTestingApp(root, [])
-root.mainloop()

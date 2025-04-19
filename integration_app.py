@@ -67,9 +67,3 @@ class InterrogationApp:
 
         threading.Thread(target=task).start()
 
-
-
-
-root = tk.Tk()
-app = InterrogationApp(root, [])
-root.mainloop()

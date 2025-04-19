@@ -5,7 +5,6 @@ import random
 from website_blocker_app import WebsiteBlockerApp
 from breathing_app import BreathingApp
 from drawing_app import DrawingApp
-from encouragement_app import EncouragementApp
 from self_explanation_app import SelfExplanationApp
 from integration_app import InterrogationApp
 from practice_testing_app import PracticeTestingApp
@@ -17,7 +16,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 class AppController:
     def __init__(self):
         self.root = tk.Tk()
-        self.chat_gpt_messages = None
+        self.chat_gpt_messages = [] 
 
 
         self.root.withdraw()  # Hide the main window initially
@@ -27,7 +26,6 @@ class AppController:
             "breathing": BreathingApp,
             "drawing": DrawingApp,
             "pomodoro": PomodoroTimer,
-            "encouragement": EncouragementApp,
             "explanation": SelfExplanationApp,
             "integration": InterrogationApp,
             "practice": PracticeTestingApp
@@ -57,7 +55,11 @@ class AppController:
     def open_app(self, app_name):
         if app_name in self.apps and not self.app_states[app_name]:
             new_window = tk.Toplevel(self.root)
-            self.app_instances[app_name] = self.apps[app_name](new_window,self.chat_gpt_messages)  # Create an instance of the app class
+            if app_name == "pomodoro":
+                self.app_instances[app_name] = self.apps[app_name](new_window)  # Create an instance of the app class
+            else:
+                self.app_instances[app_name] = self.apps[app_name](new_window,self.chat_gpt_messages)  # Create an instance of the app class
+
             self.app_states[app_name] = True
 
             def on_close():
