@@ -112,7 +112,7 @@ class ReadingTrackerApp:
 
     def get_date_from_timestamp(self, timestamp):
         # Convert Chrome's timestamp (microseconds since Jan 1, 1601) to seconds since epoch
-        timestamp = timestamp / 1000000
+        timestamp = timestamp / 1000000 - 11644473600
         visit_time = datetime.fromtimestamp(timestamp, tz=timezone.utc)
         return visit_time.strftime('%Y-%m-%d')
 
