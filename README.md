@@ -48,8 +48,7 @@ Click *Settings* and enter in desired work duration, short-break duration, and l
 ![Work Duration](assets/work-duration.png)
 ![Short-Break Duration](assets/short%20duration.png)
 ![Long-Break Duration](assets/long%20duration.png)
-
-Click *Start* to begin the timer
+Finally, click *Start* to begin the timer
 
 # Break Apps
 
