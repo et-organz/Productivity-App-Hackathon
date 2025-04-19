@@ -5,11 +5,11 @@ from openai import OpenAI
 import os
 
 load_dotenv()
+
 openai_session = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-class ElaborativeInterrogationApp:
-    def __init__(self, root, openai_client):
+class SelfExplanationApp:
+    def __init__(self, root, messages):
         self.root = root
-        self.openai_client = openai_client
         self.frame = tk.Frame(root)
         self.frame.pack(padx=10, pady=10)
 
@@ -27,42 +27,40 @@ class ElaborativeInterrogationApp:
 
         self.previous_learnings = []
 
-        # Keep track of full conversation history
-        self.messages = [
-            {"role": "system", "content": "You are a tutor helping students elaborate on their learning."}
-        ]
+        # Track conversation messages
+        self.messages = messages
+        self.messages.append({"role": "system", "content": "You help students make connections between concepts they've learned."})
 
     def submit_learning(self):
         current_learning = self.learning_input.get("1.0", tk.END).strip()
         if current_learning:
             self.previous_learnings.append(current_learning)
-            self.generate_elaborative_interrogation(current_learning)
+            self.generate_self_explanation(current_learning)
 
-    def generate_elaborative_interrogation(self, current_learning):
+    def generate_self_explanation(self, current_learning):
         def task():
             user_message = (
-                "The student just said: "
-                f"'{current_learning}'. "
+                "You are a tutor helping a student reflect on what they learned. "
+                f"The student just said: '{current_learning}'. "
                 f"Their past learnings were: {self.previous_learnings[:-1]}. "
-                "Ask the student questions that help them elaborate on the concept and explain how it connects to what they have learned before."
+                "Help them explain how what they just learned relates to their past learnings."
             )
 
-            # Append user input to message history
+            # Add user message to conversation history
             self.messages.append({"role": "user", "content": user_message})
 
             try:
-                response = self.openai_client.chat.completions.create(
+                response = openai_session.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=self.messages,
                     temperature=0.7
                 )
 
-                assistant_message = response.choices[0].message.content
+                assistant_message = response.choices[0].message['content']
 
-                # Append assistant response to message history
+                # Add assistant response to conversation history
                 self.messages.append({"role": "assistant", "content": assistant_message})
 
-                # Display the assistant's response
                 self.response_label.config(text=assistant_message)
 
             except Exception as e:
@@ -70,10 +68,5 @@ class ElaborativeInterrogationApp:
 
         threading.Thread(target=task).start()
 
-if __name__ == "__main__":
-    app_controller = AppController()
-    openai_client = app_controller.get_openai_session()
 
-    root = tk.Tk()
-    app = ElaborativeInterrogationApp(root, openai_client)
-    root.mainloop()
+

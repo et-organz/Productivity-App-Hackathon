@@ -5,9 +5,8 @@ from openai import OpenAI
 import os
 
 load_dotenv()
-
 openai_session = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-class SelfExplanationApp:
+class InterrogationApp:
     def __init__(self, root, messages):
         self.root = root
         self.frame = tk.Frame(root)
@@ -26,28 +25,26 @@ class SelfExplanationApp:
         self.response_label.pack(pady=10)
 
         self.previous_learnings = []
-
-        # Track conversation messages
-        self.messages = [
-            {"role": "system", "content": "You help students make connections between concepts they've learned."}
-        ]
+        self.messages = messages
+        # Keep track of full conversation history
+        self.messages.append({"role": "system", "content": "You are a tutor helping students elaborate on their learning."})
 
     def submit_learning(self):
         current_learning = self.learning_input.get("1.0", tk.END).strip()
         if current_learning:
             self.previous_learnings.append(current_learning)
-            self.generate_self_explanation(current_learning)
+            self.generate_elaborative_interrogation(current_learning)
 
-    def generate_self_explanation(self, current_learning):
+    def generate_elaborative_interrogation(self, current_learning):
         def task():
             user_message = (
-                "You are a tutor helping a student reflect on what they learned. "
-                f"The student just said: '{current_learning}'. "
+                "The student just said: "
+                f"'{current_learning}'. "
                 f"Their past learnings were: {self.previous_learnings[:-1]}. "
-                "Help them explain how what they just learned relates to their past learnings."
+                "Ask the student questions that help them elaborate on the concept and explain how it connects to what they have learned before."
             )
 
-            # Add user message to conversation history
+            # Append user input to message history
             self.messages.append({"role": "user", "content": user_message})
 
             try:
@@ -57,11 +54,12 @@ class SelfExplanationApp:
                     temperature=0.7
                 )
 
-                assistant_message = response.choices[0].message['content']
+                assistant_message = response.choices[0].message.content
 
-                # Add assistant response to conversation history
+                # Append assistant response to message history
                 self.messages.append({"role": "assistant", "content": assistant_message})
 
+                # Display the assistant's response
                 self.response_label.config(text=assistant_message)
 
             except Exception as e:
@@ -70,8 +68,8 @@ class SelfExplanationApp:
         threading.Thread(target=task).start()
 
 
-# Create OpenAI client and launch the app
+
 
 root = tk.Tk()
-app = SelfExplanationApp(root)
+app = InterrogationApp(root, [])
 root.mainloop()
