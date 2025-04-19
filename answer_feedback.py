@@ -64,19 +64,25 @@ class AnswerFeedbackApp:
                     questions.append((q.replace("Q:", "").strip(), a.strip()))
                 elif line.startswith("Q:"):
                     question = line.replace("Q:", "").strip()
-                    questions.append((question, ""))
+                    questions.append((question, ""))  # Empty answer
                 elif line.startswith("A:") and questions:
                     answer = line.replace("A:", "").strip()
-                    questions[-1] = (questions[-1][0], answer)
+                    questions[-1] = (questions[-1][0], answer)  # Update last question with answer
 
         if current_url and questions:
             parsed[current_url] = questions
 
         return parsed
 
+    def shorten_url(self, url, max_length=60):
+        if len(url) <= max_length:
+            return url
+        return f"{url[:30]}...{url[-25:]}"  # Keeps beginning and end of the URL
+
     def display_feedback(self):
         for url, qas in self.parsed_data.items():
-            url_label = ttk.Label(self.scrollable_frame, text=f"Feedback for: {url}", font=("Helvetica", 12, "bold"))
+            short_url = self.shorten_url(url)
+            url_label = ttk.Label(self.scrollable_frame, text=f"Feedback for: {short_url}", font=("Helvetica", 12, "bold"))
             url_label.pack(anchor="w", pady=(10, 5))
 
             for question, answer in qas:
@@ -85,6 +91,10 @@ class AnswerFeedbackApp:
                 ttk.Label(self.scrollable_frame, text=f"Q: {question}", font=("Helvetica", 11, "italic"), wraplength=500, justify="left").pack(anchor="w", padx=20, pady=(5, 0))
                 ttk.Label(self.scrollable_frame, text=f"Your Answer: {answer}", font=("Helvetica", 11), wraplength=500, justify="left").pack(anchor="w", padx=20)
                 ttk.Label(self.scrollable_frame, text=f"Feedback: {feedback}", font=("Helvetica", 11), wraplength=500, justify="left", foreground="green").pack(anchor="w", padx=20, pady=(0, 10))
+
+        # Move Close button here, after all feedback has been rendered
+        self.close_button = ttk.Button(self.scrollable_frame, text="Close", command=self.close_window)
+        self.close_button.pack(pady=20)
 
     def get_feedback_from_gpt(self, question, answer):
         try:
@@ -106,29 +116,10 @@ class AnswerFeedbackApp:
         except Exception as e:
             return f"Error getting feedback: {e}"
 
-if __name__ == "__main__":
-    example_input = """
-From: https://en.wikipedia.org/wiki/Comet
-Q: 1. What are the main components of a comet and how do they contribute to the appearance of a comet as it approaches the Sun?
-A: The main components of a commet are the nucleus, coma, tail, and hydrogen cloud. As the comet approaches the sun, the sun's heat causes the ice in the nucleus to sublimate creating the coman and forming the tail. The solar wind  from the sun pushes the ionized gases away from the sun forming the ion tail.
+    def close_window(self):
+        self.root.destroy()
 
-Q: 2. How do scientists classify comets based on their orbital characteristics and what are the differences between short-period and long-period comets?
-A: Commets are classified based on their orbital period. Short-period commets have an orbital period of less than 200 years and are generally elliptical and low eccentricty. Long-period commets have an orbital period of more than 200 years and are hightly elongated or parabolic in shape.
-
-Q: 3. Explain the process of sublimation in relation to comets and how it affects the development of the coma and tail during a comet's journey through the solar system.
-A: Sublimation allows the nucleus of the commet to stay solid and cold while the suns sublimats the outer nucleus and creates the coma and tails. As the comet gets closer to the sun, it's sublimation increases causes the coma to expand and brighten, and when it moves away from the sun for both to fade.
-
-From: https://en.wikipedia.org/wiki/Epic_poetry
-Q: 1. What are the key characteristics of epic poetry as discussed in the article?
-A: Key characteristics are a hero's legendary status, a vast setting, supernatural elements, elevated language and style, a great journey or quest, epic battles, and themess of honor, glory and fate.
-
-Q: 2. How do epic poems differ from other forms of poetry, and what makes them unique?
-A: Epic poems are user longer and tell a fully story. They usually center around a heroic figure. Epic poems are also usually use elevated, formal, and grand language. These poems also focus on purpose and are important cultural or religious artifacts for many cultures.
-
-Q: 3. Can you identify and explain the significance of any specific examples of epic poetry mentioned in the article?
-A: I'm not really sure. I haven't read many epic poems. I do like twinkle twinkle little star thought.
-"""
-
+def create_feedback(input):
     root = tk.Tk()
-    app = AnswerFeedbackApp(root, example_input)
+    app = AnswerFeedbackApp(root, input)
     root.mainloop()

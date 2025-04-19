@@ -6,7 +6,7 @@ import threading
 import shutil
 from pathlib import Path
 from datetime import datetime, timezone
-
+from select_links import create_select_links
 class ReadingTrackerApp:
     def __init__(self, root):
         self.root = root
@@ -14,7 +14,7 @@ class ReadingTrackerApp:
         self.history_path = self.get_chrome_history_path()
         self.seen_urls = {}  # Dictionary to store URLs organized by date
         self.session_urls = set()  # Stores all URLs tracked during a session
-        self.url_file_path = "seen_urls.txt"  # File to store URLs
+        self.url_file_path = "./seen_urls.txt"  # File to store URLs
 
         # Load URLs from the file if it exists
         self.load_seen_urls_from_file()
@@ -22,7 +22,11 @@ class ReadingTrackerApp:
         self.frame = tk.Frame(root)
         self.frame.pack(padx=10, pady=10)
 
-        self.label = tk.Label(self.frame, text="Click to start tracking websites using chrome browser", font=("Helvetica", 12))
+        self.label = tk.Label(
+            self.frame,
+            text="Click to start tracking websites using Chrome browser",
+            font=("Helvetica", 12)
+        )
         self.label.pack(pady=5)
 
         self.track_button = tk.Button(self.frame, text="Start Tracking", command=self.toggle_tracking)
@@ -31,7 +35,16 @@ class ReadingTrackerApp:
         self.clear_button = tk.Button(self.frame, text="Clear Saved Sites", command=self.clear_saved_sites)
         self.clear_button.pack(pady=5)
 
-        self.response_label = tk.Label(self.frame, text="", wraplength=400, font=("Helvetica", 12), justify="left")
+        self.continue_button = tk.Button(self.frame, text="Continue", command=self.close_window)
+        self.continue_button.pack(pady=10)
+
+        self.response_label = tk.Label(
+            self.frame,
+            text="",
+            wraplength=400,
+            font=("Helvetica", 12),
+            justify="left"
+        )
         self.response_label.pack(pady=10)
 
     def get_chrome_history_path(self):
@@ -109,16 +122,21 @@ class ReadingTrackerApp:
                     file.write(f"  {url}\n")
 
     def load_seen_urls_from_file(self):
-        if os.path.exists(self.url_file_path):
-            with open(self.url_file_path, "r") as file:
-                current_date = None
-                for line in file:
-                    line = line.strip()
-                    if line.endswith(":"):
-                        current_date = line[:-1]
-                        self.seen_urls[current_date] = set()
-                    elif current_date:
-                        self.seen_urls[current_date].add(line)
+        # Ensure the file exists
+        if not os.path.exists(self.url_file_path):
+            with open(self.url_file_path, "w") as file:
+                pass  # Just create an empty file
+
+        # Now read from the file
+        with open(self.url_file_path, "r") as file:
+            current_date = None
+            for line in file:
+                line = line.strip()
+                if line.endswith(":"):
+                    current_date = line[:-1]
+                    self.seen_urls[current_date] = set()
+                elif current_date:
+                    self.seen_urls[current_date].add(line)
 
     def clear_saved_sites(self):
         self.seen_urls.clear()
@@ -132,10 +150,14 @@ class ReadingTrackerApp:
         visit_time = datetime.fromtimestamp(timestamp, tz=timezone.utc)
         return visit_time.strftime('%Y-%m-%d')
 
-    def shorten_url(self, url, length=15):
+    def shorten_url(self, url, length=60):
         return url if len(url) <= length else url[:length] + "..."
 
-if __name__ == "__main__":
+    def close_window(self):
+        self.root.destroy()
+        create_select_links()
+
+def create_web_tracking():
     root = tk.Tk()
     root.title("Website Tracker")
     app = ReadingTrackerApp(root)

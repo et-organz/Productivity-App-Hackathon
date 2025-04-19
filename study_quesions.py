@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from dotenv import load_dotenv
 import openai
-
+from answer_feedback import create_feedback
 # Load environment variables from .env file
 load_dotenv()
 
@@ -85,11 +85,16 @@ class StudyQuestionApp:
             return [f"Failed to load questions for {url}: {e}"]
 
     def display_questions(self, url, questions):
-        url_label = ttk.Label(self.scrollable_frame, text=url, font=("Helvetica", 12, "bold"))
+        # Shorten the URL if it's longer than 60 characters
+        shortened_url = self.shorten_url(url)
+
+        # Display the shortened URL
+        url_label = ttk.Label(self.scrollable_frame, text=shortened_url, font=("Helvetica", 12, "bold"))
         url_label.pack(anchor="w", pady=(10, 0))
 
         self.answer_entries[url] = []
 
+        # Display each question with a corresponding text box
         for q in questions:
             if not q.strip():
                 continue
@@ -100,22 +105,27 @@ class StudyQuestionApp:
             answer_entry.pack(padx=20, pady=5)
             self.answer_entries[url].append((q.strip(), answer_entry))
 
+    def shorten_url(self, url):
+        if len(url) > 60:
+            return url[:60] + "..."
+        return url
+
     def submit_answers(self):
-        print("User Answers:\n" + "-" * 30)
+
+        result = "User Answers:\n" + "-" * 60
         for url, entries in self.answer_entries.items():
-            print(f"\nFrom: {url}")
+            result = result + "\nFrom: " + url
             for question, entry_widget in entries:
                 answer = entry_widget.get("1.0", "end").strip()
-                print(f"Q: {question}")
-                print(f"A: {answer}\n")
+                result = result + "Q: " + question
+                result = result + "A: " + answer +"\n"
+        print(result)
+        # Close the window after submission
 
-if __name__ == "__main__":
-    # Test input
-    example_links = [
-        "https://en.wikipedia.org/wiki/Comet",
-        "https://en.wikipedia.org/wiki/Epic_poetry"
-    ]
+        self.root.withdraw()
+        create_feedback(result)
 
+def create_study_questions(urls):
     root = tk.Tk()
-    app = StudyQuestionApp(root, example_links)
+    app = StudyQuestionApp(root, urls)
     root.mainloop()

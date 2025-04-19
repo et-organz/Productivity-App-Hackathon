@@ -7,6 +7,8 @@ from breathing_app import BreathingApp
 from drawing_app import DrawingApp
 from integration_app import InterrogationApp
 from practice_testing_app import PracticeTestingApp
+
+from web_tracking_app import create_web_tracking
 import os
 from dotenv import load_dotenv
 import openai
@@ -37,12 +39,31 @@ class AppController:
         confirm_window = tk.Toplevel(self.root)
         confirm_window.title("Choose an option")
 
-        yes_button = tk.Button(confirm_window, text="Begin Focusing", command=lambda: self.start_pomodoro(confirm_window), font=("Helvetica", 14))
-        yes_button.pack(side=tk.LEFT, padx=20)
+        pomodoro_button = tk.Button(
+            confirm_window,
+            text="Begin Focusing",
+            command=lambda: self.start_pomodoro(confirm_window),
+            font=("Helvetica", 14)
+        )
+        pomodoro_button.pack(side=tk.LEFT, padx=20)
 
-        no_button = tk.Button(confirm_window, text="Open Blocked Sites", command=lambda: self.open_app("website_blocker"), font=("Helvetica", 14))
-        no_button.pack(side=tk.RIGHT, padx=20)
+        blocker_button = tk.Button(
+            confirm_window,
+            text="Open Blocked Sites",
+            command=lambda: self.open_app("website_blocker"),
+            font=("Helvetica", 14)
+        )
+        blocker_button.pack(side=tk.LEFT, padx=20)
 
+        track_button = tk.Button(
+            confirm_window,
+            text="Start Tracking",
+            command=lambda: self.start_tracking(),
+            font=("Helvetica", 14)
+        )
+        track_button.pack(side=tk.LEFT, padx=20)
+    def start_tracking(self):
+        create_web_tracking()
     def start_pomodoro(self, confirm_window):
         """Start the Pomodoro timer and close the confirmation window."""
         if "website_blocker" in  self.app_instances:

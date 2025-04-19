@@ -1,12 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 from pathlib import Path
+from study_quesions import create_study_questions
 
 class LinkSelectorApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Select Links")
-        self.link_vars = []
+        self.link_vars = []  # Store the variables linked to the checkbuttons
 
         self.create_widgets()
         self.load_links()
@@ -34,9 +35,9 @@ class LinkSelectorApp:
         self.submit_button.pack(pady=10)
 
     def load_links(self):
-        filepath = Path("seen_urls.txt")
+        filepath = Path("./seen_urls.txt")
         if not filepath.exists():
-            label = ttk.Label(self.scrollable_frame, text="No seen_urls.txt found.", font=("Helvetica", 12))
+            label = ttk.Label(self.scrollable_frame, text="No Urls given", font=("Helvetica", 12))
             label.pack(pady=10)
             return
 
@@ -49,10 +50,11 @@ class LinkSelectorApp:
                     date_label = ttk.Label(self.scrollable_frame, text=current_date, font=("Helvetica", 14, "bold"))
                     date_label.pack(anchor="w", pady=(10, 0))
                 elif line and current_date:
-                    var = tk.BooleanVar()
-                    chk = ttk.Checkbutton(self.scrollable_frame, text=line, variable=var)
+                    # Initialize BooleanVar with False (initially unchecked)
+                    var = tk.BooleanVar(value=False)
+                    chk = ttk.Checkbutton(self.scrollable_frame, text=line, variable=var, onvalue=True, offvalue=False)
                     chk.pack(anchor="w", padx=10)
-                    self.link_vars.append((var, line))
+                    self.link_vars.append((var, line))  # Append var and link
 
     def submit_selection(self):
         selected_links = [url for var, url in self.link_vars if var.get()]
@@ -63,7 +65,13 @@ class LinkSelectorApp:
         else:
             print("No links selected.")
 
-if __name__ == "__main__":
+        # Close the window after submitting
+        self.root.destroy()
+
+        # Create study questions for the selected links
+        create_study_questions(selected_links)
+
+def create_select_links():
     root = tk.Tk()
     app = LinkSelectorApp(root)
     root.mainloop()

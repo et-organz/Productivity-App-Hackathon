@@ -1,24 +1,11 @@
 2025-04-19:
-  https://bruinaihack.devpost.com/
-  https://en.wikipedia.org/wiki/Age_of_Enlightenment
-  https://en.wikipedia.org/wiki/Astronomer
-  https://en.wikipedia.org/wiki/Comet
-  https://en.wikipedia.org/wiki/Epic_poetry
-  https://en.wikipedia.org/wiki/Galileo_Galilei
-  https://en.wikipedia.org/wiki/Narrative_poem
-  https://en.wikipedia.org/wiki/Narrative_poetry
-  https://en.wikipedia.org/wiki/Old_English
-  https://en.wikipedia.org/wiki/Robert_Browning
-  https://en.wikipedia.org/wiki/Romanticism
-  https://en.wikipedia.org/wiki/The_Ring_and_the_Book
-  https://en.wikipedia.org/wiki/Victorian_literature
-2394-04-19:
-  https://en.wikipedia.org/wiki/Age_of_Enlightenment
-  https://en.wikipedia.org/wiki/Epic_poetry
-  https://en.wikipedia.org/wiki/Galileo_Galilei
-  https://en.wikipedia.org/wiki/Narrative_poem
-  https://en.wikipedia.org/wiki/Narrative_poetry
-  https://en.wikipedia.org/wiki/Robert_Browning
-  https://en.wikipedia.org/wiki/Romanticism
-  https://en.wikipedia.org/wiki/The_Ring_and_the_Book
-  https://en.wikipedia.org/wiki/Victorian_literature
+  https://es.wikipedia.org/wiki/Espa%C3%B1ol_(idioma)
+  https://es.wikipedia.org/wiki/Idioma_croata
+  https://es.wikipedia.org/wiki/Idioma_espa%C3%B1ol
+  https://es.wikipedia.org/wiki/Idioma_marso
+  https://es.wikipedia.org/wiki/Idioma_serbocroata
+  https://es.wikipedia.org/wiki/Lenguas_indoeuropeas
+  https://es.wikipedia.org/wiki/Lenguas_osco-umbras
+  https://es.wikipedia.org/wiki/Lenguas_romances
+  https://es.wikipedia.org/wiki/Luis_I_de_Hungr%C3%ADa
+  https://es.wikipedia.org/wiki/Serbocroata
