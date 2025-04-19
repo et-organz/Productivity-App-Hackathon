@@ -55,7 +55,7 @@ class AppController:
     def open_app(self, app_name, time= 500):
         if app_name in self.apps and not self.app_states[app_name]:
             new_window = tk.Toplevel(self.root)
-            if app_name == "pomodoro" or app_name == "drawing":
+            if app_name == "pomodoro" or app_name == "drawing" or app_name == "website_blocker":
                 self.app_instances[app_name] = self.apps[app_name](new_window)  # Create an instance of the app class
             elif app_name == "breathing":
                 self.app_instances[app_name] = self.apps[app_name](new_window,time)  # Create an instance of the app class
@@ -72,7 +72,7 @@ class AppController:
 
     def close_app(self, app_name):
         if app_name in self.app_instances:
-            if app_name != "pomodoro" and app_name != "drawing" and app_name != "breathing":
+            if app_name != "pomodoro" and app_name != "drawing" and app_name != "breathing" and app_name != "website_blocker":
                 self.chat_gpt_messages = self.app_instances[app_name].messages
             self.app_instances[app_name].master.destroy()
             self.app_states[app_name] = False
