@@ -36,32 +36,34 @@ class InterrogationApp:
             self.generate_elaborative_interrogation(current_learning)
 
     def generate_elaborative_interrogation(self, current_learning):
-        def task():
-            user_message = (
-                "The student just said: "
-                f"'{current_learning}'. "
-                f"Their past learnings were: {self.previous_learnings[:-1]}. "
-                "Ask the student questions that help them elaborate on the concept and explain how it connects to what they have learned before."
+        user_message = (
+            "The student just said: "
+            f"'{current_learning}'. "
+            f"Their past learnings were: {self.previous_learnings[:-1]}. "
+            "Ask the student questions that help them elaborate on the concept and explain how it connects to what they have learned before."
+        )
+
+        # Append user input to message history
+        self.messages.append({"role": "user", "content": user_message})
+        self.response_label.config(text="Waiting for response")
+        try:
+            response = openai_session.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=self.messages,
+                temperature=0.7
             )
 
-            # Append user input to message history
-            self.messages.append({"role": "user", "content": user_message})
+            assistant_message = response.choices[0].message.content
+            print("this is assistant message ",assistant_message)
+            # Append assistant response to message history
+            self.messages.append({"role": "assistant", "content": assistant_message})
 
-            try:
-                response = openai_session.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=self.messages,
-                    temperature=0.7
-                )
+            # Display the assistant's response
+            self.response_label.config(text=assistant_message)
 
-                assistant_message = response.choices[0].message.content
+        except Exception as e:
+            self.response_label.config(text=f"Error: {e}")
 
-                # Append assistant response to message history
-                self.messages.append({"role": "assistant", "content": assistant_message})
-
-                # Display the assistant's response
-                self.response_label.config(text=assistant_message)
-
-            except Exception as e:
-                self.response_label.config(text=f"Error: {e}")
-
+root = tk.Tk()
+app = InterrogationApp(root,[])
+root.mainloop()
