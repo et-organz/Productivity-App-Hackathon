@@ -5,7 +5,6 @@ import random
 from website_blocker_app import WebsiteBlockerApp
 from breathing_app import BreathingApp
 from drawing_app import DrawingApp
-from self_explanation_app import SelfExplanationApp
 from integration_app import InterrogationApp
 from practice_testing_app import PracticeTestingApp
 import os
@@ -26,7 +25,6 @@ class AppController:
             "breathing": BreathingApp,
             "drawing": DrawingApp,
             "pomodoro": PomodoroTimer,
-            "explanation": SelfExplanationApp,
             "integration": InterrogationApp,
             "practice": PracticeTestingApp
         }
@@ -89,7 +87,7 @@ class AppController:
             self.app_instances[app_name].root.deiconify()
 
     def get_random_app_name(self):
-        choices = [name for name in ["breathing", "drawing", "explanation","integration","practice"] if not self.app_states[name]]
+        choices = [name for name in ["breathing", "drawing","integration","practice"] if not self.app_states[name]]
         if choices:
             return random.choice(choices)
     def find_open_break_app(self):
@@ -111,6 +109,7 @@ class PomodoroTimer(AppController):
         self.working = True
         self.cycle_count = 0
         self.is_running = False
+        self.is_paused = False
         self.time_left = self.work_duration
 
         self.label = tk.Label(master, text="Pomodoro Timer", font=("Helvetica", 24))
@@ -125,6 +124,9 @@ class PomodoroTimer(AppController):
         self.start_button = tk.Button(master, text="Start", command=self.start_timer, font=("Helvetica", 14))
         self.start_button.pack(side=tk.LEFT, padx=20)
 
+        self.pause_button = tk.Button(master, text="Pause", command=self.toggle_pause, font=("Helvetica", 14))
+        self.pause_button.pack(side=tk.LEFT, padx=20)
+
         self.reset_button = tk.Button(master, text="Reset", command=self.reset_timer, font=("Helvetica", 14))
         self.reset_button.pack(side=tk.RIGHT, padx=20)
 
@@ -138,14 +140,22 @@ class PomodoroTimer(AppController):
     def start_timer(self):
         if not self.is_running:
             self.is_running = True
+            self.is_paused = False
             self.countdown()
 
+    def toggle_pause(self):
+        if self.is_running:
+            self.is_paused = not self.is_paused
+            if not self.is_paused:
+                self.countdown()
+            self.pause_button.config(text="Resume" if self.is_paused else "Pause")
+
     def countdown(self):
-        if self.time_left > 0:
+        if self.time_left > 0 and not self.is_paused:
             self.timer_label.config(text=self.format_time(self.time_left))
             self.time_left -= 1
             self.master.after(1000, self.countdown)
-        else:
+        elif self.time_left == 0 and not self.is_paused:
             self.is_running = False
             if self.working == False:
                 self.working = True
@@ -157,34 +167,37 @@ class PomodoroTimer(AppController):
                 self.start_timer()
                 return
             self.cycle_count += 1
-            if self.cycle_count % 4 == 0:  # Every 4 cycles, take a long break
+            if self.cycle_count % 4 == 0:
                 self.time_left = self.long_break_duration
                 self.status_label.config(text="Status: Long Break")
                 self.break_app = self.get_random_app_name()
                 self.notify("Time for a long break! \n Opening "+ self.break_app + " app")
-                self.open_app(self.break_app, self.long_break_duration)  # Open a random app during long break
+                self.open_app(self.break_app, self.long_break_duration)
                 self.working = False
             else:
                 self.time_left = self.short_break_duration
                 self.status_label.config(text="Status: Short Break")
                 self.break_app = self.get_random_app_name()
                 self.notify("Time for a short break!\n Opening "+ self.break_app + " app")
-                self.open_app(self.break_app, self.short_break_duration)  # Open a random app during short break
+                self.open_app(self.break_app, self.short_break_duration)
                 self.working = False
 
-            self.start_timer()  # Automatically start the next session
+            self.start_timer()
 
     def notify(self, message):
         messagebox.showinfo("Pomodoro Timer", message)
 
     def reset_timer(self):
         self.is_running = False
+        self.is_paused = False
         self.working = True
         self.cycle_count = 0
         self.time_left = self.work_duration
         self.timer_label.config(text=self.format_time(self.time_left))
-        self.status_label.config(text="Status: Working")  # Reset status label
+        self.status_label.config(text="Status: Working")
+        self.pause_button.config(text="Pause")
         self.break_app = None
+
     def open_settings(self):
         work_minutes = simpledialog.askinteger("Work Duration", "Enter work duration in minutes:", initialvalue=25)
         short_break_minutes = simpledialog.askinteger("Short Break Duration", "Enter short break duration in minutes:", initialvalue=5)
@@ -197,6 +210,6 @@ class PomodoroTimer(AppController):
         if long_break_minutes is not None:
             self.long_break_duration = long_break_minutes * 60
 
-        self.reset_timer()  # Reset the timer to apply new settings
+        self.reset_timer()
 
 
