@@ -7,7 +7,7 @@ import os
 load_dotenv()
 openai_session = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 class PracticeTestingApp:
-    def __init__(self, root):
+    def __init__(self, root, messages):
         self.root = root
         self.frame = tk.Frame(root)
         self.frame.pack(padx=10, pady=10)
@@ -24,10 +24,9 @@ class PracticeTestingApp:
         self.test_output_label = tk.Label(self.frame, text="", wraplength=400, font=("Helvetica", 12))
         self.test_output_label.pack(pady=10)
 
+        self.messages = messages
         # Track conversation messages
-        self.messages = [
-            {"role": "system", "content": "You help students generate practice test questions."}
-        ]
+        self.messages.append({"role": "system", "content": "You help students generate practice test questions."})
 
     def generate_practice_test(self):
         learning_goal = self.goal_input.get("1.0", tk.END).strip()
@@ -66,5 +65,5 @@ class PracticeTestingApp:
 # Create OpenAI client and launch the app
 
 root = tk.Tk()
-app = PracticeTestingApp(root)
+app = PracticeTestingApp(root, [])
 root.mainloop()
