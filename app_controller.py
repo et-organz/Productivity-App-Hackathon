@@ -52,11 +52,13 @@ class AppController:
         confirm_window.destroy()  # Close the confirmation window
         self.open_app("pomodoro")  # Open the Pomodoro timer
 
-    def open_app(self, app_name):
+    def open_app(self, app_name, time= 500):
         if app_name in self.apps and not self.app_states[app_name]:
             new_window = tk.Toplevel(self.root)
-            if app_name == "pomodoro":
+            if app_name == "pomodoro" or app_name == "drawing":
                 self.app_instances[app_name] = self.apps[app_name](new_window)  # Create an instance of the app class
+            elif app_name == "breathing":
+                self.app_instances[app_name] = self.apps[app_name](new_window,time)  # Create an instance of the app class
             else:
                 self.app_instances[app_name] = self.apps[app_name](new_window,self.chat_gpt_messages)  # Create an instance of the app class
 
@@ -86,7 +88,7 @@ class AppController:
             self.app_instances[app_name].root.deiconify()
 
     def get_random_app_name(self):
-        choices = [name for name in ["breathing", "drawing", "explanation","integration"] if not self.app_states[name]]
+        choices = [name for name in ["breathing", "drawing", "explanation","integration","practice"] if not self.app_states[name]]
         if choices:
             return random.choice(choices)
     def find_open_app(self):
@@ -159,14 +161,14 @@ class PomodoroTimer(AppController):
                 self.status_label.config(text="Status: Long Break")
                 self.break_app = self.get_random_app_name()
                 self.notify("Time for a long break! \n Opening "+ self.break_app + " app")
-                self.open_app(self.break_app)  # Open a random app during long break
+                self.open_app(self.break_app, self.long_break_duration)  # Open a random app during long break
                 self.working = False
             else:
                 self.time_left = self.short_break_duration
                 self.status_label.config(text="Status: Short Break")
                 self.break_app = self.get_random_app_name()
                 self.notify("Time for a short break!\n Opening "+ self.break_app + " app")
-                self.open_app(self.break_app)  # Open a random app during short break
+                self.open_app(self.break_app, self.short_break_duration)  # Open a random app during short break
                 self.working = False
 
             self.start_timer()  # Automatically start the next session

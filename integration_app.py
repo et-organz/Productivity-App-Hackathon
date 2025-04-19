@@ -65,5 +65,3 @@ class InterrogationApp:
             except Exception as e:
                 self.response_label.config(text=f"Error: {e}")
 
-        threading.Thread(target=task).start()
-

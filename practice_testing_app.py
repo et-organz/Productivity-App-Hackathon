@@ -60,4 +60,3 @@ class PracticeTestingApp:
             except Exception as e:
                 self.test_output_label.config(text=f"Error: {e}")
 
-        threading.Thread(target=task).start()

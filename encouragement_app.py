@@ -6,17 +6,16 @@ import os
 load_dotenv()
 
 
-
+openai_session = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 class EncouragementApp:
-    def __init__(self, root, openai_client):
+    def __init__(self, root):
         self.master = root
         self.update_encouragement()
-        self.openai_client = openai_client
 
     def fetch_encouragement(self):
         prompt = "Give me a short encouraging message to stay focused during a work session."
         try:
-            response = self.openai_client.chat.completions.create(
+            response = openai_session.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a motivational coach helping users stay focused. Your responses can not be longer than 10 words."},
@@ -24,7 +23,7 @@ class EncouragementApp:
                 ],
                 temperature=0.7
             )
-            message = response.choices[0].message['content']
+            message = response.choices[0].message.content
             return message
         except Exception as e:
             return f"Error: {e}"
@@ -42,7 +41,7 @@ class EncouragementApp:
             self.master.after(3000, self.master.destroy)
 
         threading.Thread(target=fetch_and_update).start()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 root = tk.Tk()
-app = EncouragementApp(root,client)
+app = EncouragementApp(root)
 root.mainloop()

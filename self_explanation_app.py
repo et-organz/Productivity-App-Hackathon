@@ -56,7 +56,7 @@ class SelfExplanationApp:
                     temperature=0.7
                 )
 
-                assistant_message = response.choices[0].message['content']
+                assistant_message = response.choices[0].message.content
 
                 # Add assistant response to conversation history
                 self.messages.append({"role": "assistant", "content": assistant_message})
@@ -66,7 +66,6 @@ class SelfExplanationApp:
             except Exception as e:
                 self.response_label.config(text=f"Error: {e}")
 
-        threading.Thread(target=task).start()
 
 
 
